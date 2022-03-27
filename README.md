@@ -14,6 +14,8 @@ Las funcionalidades disponibles se enlistan a continuación:
 * Pronto se agregarán más funcionalidades
 
 ## Uso
+Para  ejecutar el programa es necesario tener instalado Python 3.x  y además son necesarias ciertas dependencias, para ello se debe ejeccutar el comando "pip install -r requirements.txt"
+
 * Ejecutar el comando `python main.py` para iniciar la aplicación.
 * Se mostrará un menú con las opciones disponibles.
 * Seleccionar la opción deseada, la opción `Salir` finaliza la aplicación.
