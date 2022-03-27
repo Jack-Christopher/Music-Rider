@@ -7,6 +7,11 @@ from pydeezer.constants import track_formats
 
 def set_storage_path():
     file_path = ""
+    # if file data.json soen't exists, create it
+    if not os.path.exists('data.json'):
+        with open('data.json', 'w') as f:
+            json.dump({}, f)
+
     with open('data.json', 'r') as f:
         data = json.load(f)
         if 'storage_path' not in data or data['storage_path'] == "":
@@ -39,6 +44,13 @@ def add_song(deezer):
             song[1] = temp
             break
     
+    if not os.path.exists('music.json'):
+        with open('music.json', 'w') as f:
+            json.dump({
+                "tracks": { },
+                "albums": { }
+            }, f)
+
     with open('music.json', 'r') as f:
         music = json.load(f)
         if str(song[0]) not in music['tracks']:
