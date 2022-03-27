@@ -2,7 +2,7 @@ import os
 import json
 import music_tag
 import urllib.request
-from tkinter import filedialog
+from tkinter import Tk, filedialog
 from pydeezer.constants import track_formats
 
 def set_storage_path():
@@ -15,6 +15,11 @@ def set_storage_path():
     with open('data.json', 'r') as f:
         data = json.load(f)
         if 'storage_path' not in data or data['storage_path'] == "":
+            print("Select the folder where you want to save your music files")
+            input("-- press enter to continue...")
+            root = Tk() 
+            root.withdraw()
+            root.attributes('-topmost', True)
             file_path = filedialog.askdirectory(title="Select the path to save the files")
             data = {}
             data['storage_path'] = file_path
@@ -124,7 +129,6 @@ def download(deezer):
                 album = deezer.get_album(album_id)
                 for i in album['tracks']['data']:
                     if not os.path.exists(folder_dir + i['title'] + ".mp3"):
-                        print(i)
                         download_track(deezer, i['id'], i['title'],folder_dir, music['albums'][album_id]['cover'])
                         songs['downloaded'] += 1
 
