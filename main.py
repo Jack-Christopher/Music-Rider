@@ -30,4 +30,5 @@ while (True):
         os.system("cls")
         download(deezer)
     elif option == "4":
+        os.system("cls")
         break
