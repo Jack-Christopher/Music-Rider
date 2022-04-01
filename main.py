@@ -15,20 +15,25 @@ set_storage_path()
 while (True):
     os.system("cls")
     print("Options:")
-    print("1. Add a song")
-    print("2. Add an album")
-    print("3. Perform download")
-    print("4. Exit")
+    print("1. Add songs")
+    print("2. Add multiple songs from the same artist")
+    print("3. Add albums")
+    print("4. Add multiple albums from the same artist")
+    print("5. Perform download")
+    print("6. Exit")
 
     option = input("Enter your option: ")
+    os.system("cls")
 
     if option == "1":
-        add_song(deezer)
+        add_songs(deezer)
     elif option == "2":
-        add_album(deezer)
+        add_songs_from_same_artist(deezer)
     elif option == "3":
-        os.system("cls")
-        download(deezer)
+        add_albums(deezer)
     elif option == "4":
-        os.system("cls")
+        add_albums_from_same_artist(deezer)
+    elif option == "5":
+        download(deezer)
+    elif option == "6":     
         break
