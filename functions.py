@@ -63,6 +63,7 @@ def add_song(deezer):
             json.dump(music, open('music.json', 'w'), indent=4)
         else:
             print("The song \"" + song[1]['title'] + "\" is already in the list.")
+            input("-- press enter to continue...")
 
 
 def add_album(deezer):
@@ -100,12 +101,16 @@ def download_track(deezer, track_id, track_name, file_path, img_url):
     track = deezer.get_track(track_id)
     track["download"](file_path, quality=track_formats.MP3_320, with_lyrics=False)
 
-    audiofile = music_tag.load_file(file_path+ "/" + track_name + ".mp3")
-    urllib.request.urlretrieve(img_url, os.getcwd() + "/images/temp.jpg")
-    with open('images/temp.jpg', 'rb') as img_in:
-        audiofile['artwork'] = img_in.read()
+    # audiofile = music_tag.load_file(file_path+ "/" + track_name + ".mp3")
+    # urllib.request.urlretrieve(img_url, os.getcwd() + "/images/temp.jpg")
+    # with open('images/temp.jpg', 'rb') as img_in:
+    #     audiofile['artwork'] = img_in.read()
 
-    audiofile.save()
+    # audiofile.save()
+
+
+def sanitize_name(name):
+    return name.replace("\"", "").replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u")
 
 
 def download(deezer):
@@ -117,7 +122,7 @@ def download(deezer):
         music = json.load(f)
 
         for track_id in music['tracks']:
-            if not os.path.exists(download_dir + "/" + music['tracks'][track_id]['title'] + ".mp3"):
+            if not os.path.exists(sanitize_name(download_dir + "/" + music['tracks'][track_id]['title']) + ".mp3"):
                 download_track(deezer, track_id, music['tracks'][track_id]['title'],download_dir, music['tracks'][track_id]['cover'])
                 songs['downloaded'] += 1
                                 
@@ -128,7 +133,7 @@ def download(deezer):
                 albums['downloaded'] += 1
                 album = deezer.get_album(album_id)
                 for i in album['tracks']['data']:
-                    if not os.path.exists(folder_dir + i['title'] + ".mp3"):
+                    if not os.path.exists(sanitize_name(folder_dir + i['title']) + ".mp3"):
                         download_track(deezer, i['id'], i['title'],folder_dir, music['albums'][album_id]['cover'])
                         songs['downloaded'] += 1
 
