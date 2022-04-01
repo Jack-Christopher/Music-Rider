@@ -7,6 +7,7 @@ from pydeezer.constants import track_formats
 
 def set_storage_path():
     file_path = ""
+
     # if file data.json soen't exists, create it
     if not os.path.exists('data.json'):
         with open('data.json', 'w') as f:
@@ -25,16 +26,19 @@ def set_storage_path():
             data['storage_path'] = file_path
             json.dump(data, open('data.json', 'w'), indent=4)
         else:
-            file_path = data['storage_path']                        
+            file_path = data['storage_path']
+
+    # if path to downloaded files not exist, create it
+    if not os.path.exists(file_path + "/downloaded"):
+        os.makedirs(file_path + "/downloaded")
+                
     return file_path
 
 
-def add_song(deezer):
-    song_name = input("Enter the name of the song: ")
+def add_song(deezer, song_name, song_artist):
     track_search_results = deezer.search_tracks(song_name)
     song = [None, None]
 
-    song_artist = input("Enter the name of the artist: ")
     artist_search_results = deezer.search_artists(song_artist, limit=1)
     artist_id = artist_search_results[0]['id']
 
@@ -66,11 +70,35 @@ def add_song(deezer):
             input("-- press enter to continue...")
 
 
-def add_album(deezer):
-    album_name = input("Enter the name of the album: ")
+
+def add_songs(deezer):
+    while True:
+        try:
+            os.system("cls")
+            print("Press ctrl+c to exit")
+            song_name = input("Enter the name of the song: ")
+            song_artist = input("Enter the name of the artist: ")
+            add_song(deezer, song_name, song_artist)
+        except KeyboardInterrupt:
+            break
+
+
+def add_songs_from_same_artist(deezer):
+    song_artist = input("Enter the name of the artist: ")
+    while True:
+        try:
+            os.system("cls")
+            print("Press ctrl+c to exit")
+            print("Artist: '" + song_artist + "'")
+            song_name = input("Enter the name of the song: ")
+            add_song(deezer, song_name, song_artist)
+        except KeyboardInterrupt:
+            break
+
+
+def add_album(deezer, album_name, album_artist):
     album_search_results = deezer.search_albums(album_name)
 
-    album_artist = input("Enter the name of the artist: ")
     artist_search_results = deezer.search_artists(album_artist, limit=1)
     artist_id = artist_search_results[0]['id']
 
@@ -97,6 +125,31 @@ def add_album(deezer):
             print("The album \"" + album[1]['title'] + "\" is already in the list.")
 
 
+def add_albums(deezer):
+    while True:
+        try:
+            os.system("cls")
+            print("Press ctrl+c to exit")
+            album_name = input("Enter the name of the album: ")
+            album_artist = input("Enter the name of the artist: ")
+            add_album(deezer, album_name, album_artist)
+        except KeyboardInterrupt:
+            break
+
+
+def add_albums_from_same_artist(deezer):
+    album_artist = input("Enter the name of the artist: ")
+    while True:
+        try:
+            os.system("cls")
+            print("Press ctrl+c to exit")
+            print("Artist: '" + album_artist + "'")
+            album_name = input("Enter the name of the album: ")
+            add_album(deezer, album_name, album_artist)
+        except KeyboardInterrupt:
+            break
+
+
 def download_track(deezer, track_id, track_name, file_path, img_url):
     track = deezer.get_track(track_id)
     track["download"](file_path, quality=track_formats.MP3_320, with_lyrics=False)
@@ -110,7 +163,7 @@ def download_track(deezer, track_id, track_name, file_path, img_url):
 
 
 def sanitize_name(name):
-    return name.replace("\"", "").replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u")
+    return name.replace("\"", "").replace(":", "").replace("/", ",").replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u")
 
 
 def download(deezer):
@@ -122,18 +175,18 @@ def download(deezer):
         music = json.load(f)
 
         for track_id in music['tracks']:
-            if not os.path.exists(sanitize_name(download_dir + "/" + music['tracks'][track_id]['title']) + ".mp3"):
+            if not os.path.exists(download_dir + "/downloaded/" + sanitize_name(music['tracks'][track_id]['title']) + ".mp3"):
                 download_track(deezer, track_id, music['tracks'][track_id]['title'],download_dir, music['tracks'][track_id]['cover'])
                 songs['downloaded'] += 1
                                 
         for album_id in music['albums']:
-            folder_dir = download_dir + "/" + music['albums'][album_id]['title'] + "/"
-            if not os.path.isdir(folder_dir):
-                os.mkdir(folder_dir)
+            if not os.path.isdir(download_dir + "/downloaded/" + sanitize_name(music['albums'][album_id]['title']) + "/"):
+                folder_dir = download_dir + "/" + sanitize_name(music['albums'][album_id]['title']) + "/"
+                os.makedirs(folder_dir, exist_ok=True)
                 albums['downloaded'] += 1
                 album = deezer.get_album(album_id)
                 for i in album['tracks']['data']:
-                    if not os.path.exists(sanitize_name(folder_dir + i['title']) + ".mp3"):
+                    if not os.path.exists(folder_dir + sanitize_name(i['title']) + ".mp3"):
                         download_track(deezer, i['id'], i['title'],folder_dir, music['albums'][album_id]['cover'])
                         songs['downloaded'] += 1
 
